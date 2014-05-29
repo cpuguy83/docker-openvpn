@@ -102,7 +102,7 @@ case $1 in
      exec openvpn udp1194.conf
     ;;
   --tcp)
-     exec openvpn tcp1194.conf
+     exec openvpn tcp443.conf
     ;;
   --config)
     exec serverconfig
