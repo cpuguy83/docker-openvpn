@@ -1,8 +1,0 @@
-#!/bin/bash
-
-cd /etc/openvpn
-
-exec socat -d -d \
-  OPENSSL-LISTEN:8080,fork,reuseaddr,key=key.pem,certificate=cert.pem,verify=0 \
-  EXEC:'cat client.http' \
-  2>> http8080.log

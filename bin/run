@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 [ -d /dev/net ] ||
   mkdir -p /dev/net
 [[ -c /dev/net/tun ]] ||
@@ -86,16 +88,7 @@ remote $MY_IP_ADDR 443 tcp-client
 </connection>
 EOF
 
-[ -f client.http ] || cat >client.http <<EOF
-HTTP/1.0 200 OK
-Content-Type: application/x-openvpn-profile
-Content-Length: `wc -c client.ovpn`
-
-`cat client.ovpn`
-EOF
-
 iptables -t nat -A POSTROUTING -s  5.5.0.0/16 -o eth0 -j MASQUERADE
-
 
 case $1 in
   --udp)
@@ -105,10 +98,10 @@ case $1 in
      exec openvpn tcp443.conf
     ;;
   --config)
-    exec serverconfig
+    cat client.ovpn
     ;;
   *)
     echo "No option specified, using UDP config"
-    exec openvpn udpll94.conf
+    exec openvpn udp1194.conf
     ;;
 esac
