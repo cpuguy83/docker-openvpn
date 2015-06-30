@@ -10,7 +10,7 @@ set -e
 cd /etc/openvpn
 
 [ -f dh.pem ] ||
-  openssl dhparam -out dh.pem 512
+  openssl dhparam -out dh.pem 2048
 [ -f key.pem ] ||
   openssl genrsa -out key.pem 2048
 [ -f csr.pem ] ||
