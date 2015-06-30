@@ -34,6 +34,8 @@ proto tcp-server
 port 443
 dev tun443
 status openvpn-status-443.log
+
+tls-version-min 1.2
 EOF
 
 [ -f udp1194.conf ] || cat >udp1194.conf <<EOF
@@ -51,6 +53,8 @@ proto udp
 port 1194
 dev tun1194
 status openvpn-status-1194.log
+
+tls-version-min 1.2
 EOF
 
 MY_IP_ADDR=$(curl -s http://myip.enix.org/REMOTE_ADDR)
