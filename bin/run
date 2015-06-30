@@ -10,6 +10,7 @@ function do_init() {
 		mknod /dev/net/tun c 10 200
 
 	iptables -t nat -A POSTROUTING -s  5.5.0.0/16 -o eth0 -j MASQUERADE
+	haveged -F & # -F Makes sure haveged is actually a child of this shell
 }
 
 function gen_server_config() {
@@ -101,16 +102,28 @@ function gen_client_config() {
 }
 
 
+function handle_exit() {
+	pids=($(pidof openvpn) $(pidof haveged))
+	for i in ${pids[@]}; do
+		[ "$i" == "" ] && continue
+
+		kill $i || echo "error killing ${i}"
+		wait $i || echo "error waiting on ${i}"
+	done
+}
+
+trap handle_exit EXIT
+
 case $1 in
 	--udp)
 		do_init
 		gen_server_config
-		exec openvpn udp1194.conf
+		openvpn udp1194.conf
 		;;
 	--tcp)
 		do_init
 		gen_server_config
-		exec openvpn tcp443.conf
+		openvpn tcp443.conf
 		;;
 	--config)
 		gen_client_config
@@ -119,6 +132,6 @@ case $1 in
 		echo "No option specified, using UDP config"
 		do_init
 		gen_server_config
-		exec openvpn udp1194.conf
+		openvpn udp1194.conf
 		;;
 esac
