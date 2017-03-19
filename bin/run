@@ -114,16 +114,16 @@ function handle_exit() {
 
 case $1 in
 	--udp)
+		echo "Starting server in UDP mode"
 		do_init
 		gen_server_config
-		openvpn udp1194.conf &
-		wait
+		exec openvpn udp1194.conf
 		;;
 	--tcp)
+		echo "Starting server in TCP mode"
 		do_init
 		gen_server_config
-		openvpn tcp443.conf &
-		wait
+		exec openvpn tcp443.conf
 		;;
 	--config)
 		gen_client_config
@@ -133,7 +133,6 @@ case $1 in
 		echo "No option specified, using UDP config"
 		do_init
 		gen_server_config
-		openvpn udp1194.conf &
-		wait
+		exec openvpn udp1194.conf
 		;;
 esac
