@@ -73,6 +73,16 @@ function gen_client_config() {
 			exit 1
 	}
 
+	PROTO=$(cat /etc/openvpn/proto | awk '{{ print $1 }}')
+	PORT=$(cat /etc/openvpn/proto | awk '{{ print $2 }}')
+
+	CLIENT_KIND="$PROTO"
+	if [[ "$CLIENT_KIND" == "tcp" ]]; then
+		CLIENT_KIND="tcp-client"
+	fi
+
+	export PROTO PORT CLIENT_KIND
+
 	cat <<-EOF
 		client
 		nobind
@@ -93,11 +103,11 @@ function gen_client_config() {
 		</dh>
 
 		<connection>
-		remote $MY_IP_ADDR 1194 udp
+		remote $MY_IP_ADDR ${PORT:-1194} ${PROTO:-udp}
 		</connection>
 
 		<connection>
-		remote $MY_IP_ADDR 443 tcp-client
+		remote $MY_IP_ADDR ${PORT:-1194} ${CLIENT_KIND:-udp}
 		</connection>
 	EOF
 }
@@ -117,12 +127,14 @@ case $1 in
 		echo "Starting server in UDP mode"
 		do_init
 		gen_server_config
+		echo "udp 1194" > /etc/openvpn/proto
 		exec openvpn udp1194.conf
 		;;
 	--tcp)
 		echo "Starting server in TCP mode"
 		do_init
 		gen_server_config
+		echo "tcp 443" > /etc/openvpn/proto
 		exec openvpn tcp443.conf
 		;;
 	--config)
